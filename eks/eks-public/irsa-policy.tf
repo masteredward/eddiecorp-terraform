@@ -165,3 +165,18 @@ data "aws_iam_policy_document" "ebs_csi" {
     }
   }
 }
+
+data "aws_iam_policy_document" "secret_test" {
+  statement {
+    actions = [
+      "ssm:GetParameters"
+    ]
+    resources = ["arn:aws:ssm:us-east-2:290331220558:parameter/dbpassword"]
+  }
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = ["arn:aws:kms:us-east-2:290331220558:key/a3278307-deff-47dc-99f5-653259e9c93b"]
+  }
+}

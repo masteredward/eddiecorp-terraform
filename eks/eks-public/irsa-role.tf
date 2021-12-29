@@ -43,6 +43,12 @@ resource "aws_iam_role" "eks_irsa_ebs_csi" {
   }
 }
 
+resource "aws_iam_role" "eks_irsa_amazon_cloudwatch" {
+  assume_role_policy  = data.aws_iam_policy_document.eks_irsa_amazon_cloudwatch.json
+  name                = "${aws_eks_cluster.eks_cluster.name}_irsa_amazon_cloudwatch"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
+}
+
 
 ### SINGLE-CLUSTER ROLE ###
 
@@ -62,4 +68,10 @@ resource "aws_iam_role" "eks_irsa_test_role_prd" {
   count = "${aws_eks_cluster.eks_cluster.name == "prd_eks" ? 1 : 0}"
   assume_role_policy  = data.aws_iam_policy_document.eks_irsa_test_role.json
   name                = "${aws_eks_cluster.eks_cluster.name}_test_role"
+}
+
+resource "aws_iam_role" "eks_irsa_secret_test_dev" {
+  count = "${aws_eks_cluster.eks_cluster.name == "dev_eks" ? 1 : 0}"
+  assume_role_policy  = data.aws_iam_policy_document.eks_irsa_secret_test.json
+  name                = "${aws_eks_cluster.eks_cluster.name}_secret_test"
 }

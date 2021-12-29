@@ -98,6 +98,26 @@ data "aws_iam_policy_document" "eks_irsa_ebs_csi" {
   }
 }
 
+data "aws_iam_policy_document" "eks_irsa_amazon_cloudwatch" {
+  statement {
+    principals {
+      identifiers = [aws_iam_openid_connect_provider.eks_cluster.arn]
+      type        = "Federated"
+    }
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:amazon-cloudwatch:cloudwatch-agent"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
 data "aws_iam_policy_document" "eks_irsa_test_role" {
   statement {
     principals {
@@ -109,6 +129,26 @@ data "aws_iam_policy_document" "eks_irsa_test_role" {
       test     = "StringEquals"
       variable = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}:sub"
       values   = ["system:serviceaccount:default:test-role"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "eks_irsa_secret_test" {
+  statement {
+    principals {
+      identifiers = [aws_iam_openid_connect_provider.eks_cluster.arn]
+      type        = "Federated"
+    }
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:default:netshooter"]
     }
     condition {
       test     = "StringEquals"
